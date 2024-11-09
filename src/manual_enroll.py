@@ -8,7 +8,7 @@ import os
 # --- Enrollment (Adding Approved Faces) ---
 
 # Initialize model and MTCNN
-model = InceptionResnetV1(pretrained='casia-webface').eval()
+model = InceptionResnetV1(pretrained='vggface2').eval()  # Load InceptionResnetV1 model
 mtcnn = MTCNN()
 
 # Function to enroll a new face

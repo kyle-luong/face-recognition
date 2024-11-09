@@ -24,8 +24,9 @@ for filename in os.listdir('embeddings'):
 cap = cv2.VideoCapture(2, cv2.CAP_AVFOUNDATION) # Change based on device
 threshold = 1.0  # Adjust threshold as needed
 count = 0
+face_recognized = False  # Flag to track if a face was recognized
 
-while count < 5:
+while count < 5 and not face_recognized:
     ret, frame = cap.read()
 
     if not ret:
@@ -40,8 +41,6 @@ while count < 5:
         boxes, _ = mtcnn.detect(Image.fromarray(frame_rgb))
         
         if boxes is not None:
-            face_recognized = False  # Flag to track if a face was recognized
-
             for box in boxes:
                 # Crop and preprocess the face
                 x1, y1, x2, y2 = map(int, box)
@@ -83,6 +82,8 @@ while count < 5:
 cap.release()
 cv2.destroyAllWindows()
 
-# Final message if unrecognized attempts exceed limit
-if count >= 5:
+# Final message based on recognition status
+if face_recognized:
+    print("Access granted: Face recognized.")
+elif count >= 5:
     print("Access denied: Too many unrecognized attempts.")
