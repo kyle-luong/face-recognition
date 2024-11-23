@@ -8,8 +8,12 @@ import time
 
 # --- Face Verification ---
 
+# Check for GPU availability
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+print('Running on device: {}'.format(device))
+
 # Initialize Face Recognition Model (InceptionResnetV1) and Face Detection Model (MTCNN)
-model = InceptionResnetV1(pretrained='vggface2').eval()
+model = InceptionResnetV1(pretrained='vggface2').eval().to(device)
 mtcnn = MTCNN()
 
 # Load approved face embeddings
