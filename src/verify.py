@@ -1,20 +1,28 @@
+#!/usr/bin/env python3
+"""
+verify.py
+
+Verifies an individual's identity via facecam and comparison to an enrolled feature embedding.
+"""
+
+import os
 import torch
 import cv2
 import numpy as np
-from facenet_pytorch import InceptionResnetV1, MTCNN
-from PIL import Image
-import os
 import time
 
-# --- Face Verification ---
+from facenet_pytorch import InceptionResnetV1, MTCNN
+from PIL import Image
+
+########################################
 
 # Check for GPU availability
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 print('Running on device: {}'.format(device))
 
-# Initialize Face Recognition Model (InceptionResnetV1) and Face Detection Model (MTCNN)
+# Initialize Face Detection Model (MTCNN) and Face Recognition Model (InceptionResnetV1)
+mtcnn = MTCNN(image_size=160, margin=0, device=device)
 model = InceptionResnetV1(pretrained='vggface2').eval().to(device)
-mtcnn = MTCNN()
 
 # Load approved face embeddings
 def load_embeddings(embeddings_path="embeddings"):
@@ -40,13 +48,15 @@ def recognize_face(frame, model, mtcnn, approved_embeddings, threshold=1):
             face = frame_rgb[y1:y2, x1:x2]  # Crop face
             face = Image.fromarray(face)
 
-            face = mtcnn(face) # Detect and align face
+            face = mtcnn(face) # Detect and align face into tensor
             if face is None:  # Handle detection failure
                 print("No face detected. Please try again.")
                 continue
             
             # Generate the face embedding
-            face_embedding = model(face.unsqueeze(0)).detach().numpy()
+            face = face.unsqueeze(0).to(device)  # Move to GPU or CPU
+            with torch.no_grad():  # Disable gradient computation
+                face_embedding = model(face).cpu().numpy().flatten() # Move to CPU and convert tensor to numpy
 
             # Compare with approved embeddings
             matched_name = None

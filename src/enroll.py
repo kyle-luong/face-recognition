@@ -1,11 +1,19 @@
+#!/usr/bin/env python3
+"""
+enroll.py
+
+Enrolls a face via webcam to the embeddings folder.
+"""
+
+import os
 import torch
 import cv2
 import numpy as np
+
 from facenet_pytorch import InceptionResnetV1, MTCNN
 from PIL import Image
-import os
 
-# --- Enrollment (Adding Approved Faces) ---
+########################################
 
 # Check for GPU availability
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')

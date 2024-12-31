@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+"""
+main.py
+
+Main entry point for the face recognition system.
+"""
+
 from enroll import enroll_face
 from verify import verify_face
 
